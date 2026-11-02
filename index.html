@@ -3,110 +3,116 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contexto diário — Jornada</title>
+<title>Contexto Diário — Jornada</title>
 <style>
-  :root { color-scheme: dark; --bg:#191919; --fg:#eeeeee; --muted:#a6a6a6; --line:#414141; }
-  * { box-sizing:border-box; }
-  html, body { margin:0; width:100%; min-height:100%; background:var(--bg); }
-  body { color:var(--fg); font-family: Georgia, "Times New Roman", serif; }
-  .widget { width:100%; background:var(--bg); padding:14px 16px; }
-  .main { display:grid; grid-template-columns:minmax(0,1.15fr) 1px minmax(0,1fr); align-items:center; gap:clamp(12px,3vw,26px); }
-  .divider { width:1px; height:76px; background:var(--line); }
-  .time { font-size:clamp(48px,10vw,76px); line-height:.98; letter-spacing:-2px; font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .date { margin-top:8px; color:var(--muted); font-size:clamp(15px,3.3vw,23px); line-height:1.25; }
-  .weather { min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:12px; }
-  .weather-icon { width:clamp(36px,7vw,54px); height:clamp(36px,7vw,54px); color:#d7d7d7; }
-  .temperature { font-size:clamp(38px,7.5vw,60px); line-height:1; white-space:nowrap; font-variant-numeric:tabular-nums; }
-  .range { margin-top:5px; color:var(--muted); font-size:clamp(13px,2.7vw,19px); white-space:nowrap; }
-  .city { margin-top:8px; color:var(--muted); font-size:clamp(14px,2.8vw,19px); }
-  .settings { align-self:start; border:0; background:transparent; color:var(--muted); padding:4px; cursor:pointer; font:22px Georgia,serif; line-height:1; }
-  .settings:hover { color:var(--fg); }
-  .config { display:none; margin-top:12px; padding-top:10px; border-top:1px solid var(--line); gap:8px; }
-  .config.open { display:flex; }
-  .config input { flex:1; min-width:0; background:#242424; border:1px solid #555; border-radius:5px; color:var(--fg); padding:9px 10px; font:15px Georgia,serif; }
-  .config button { background:transparent; border:1px solid #666; border-radius:5px; color:var(--fg); padding:8px 12px; font:15px Georgia,serif; cursor:pointer; }
-  .status { color:var(--muted); font-size:12px; margin-top:7px; min-height:14px; }
-  @media (max-width:520px) {
-    .widget { padding:10px 8px; }
-    .main { gap:9px; grid-template-columns:minmax(0,1fr) 1px minmax(0,1.05fr); }
-    .weather { grid-template-columns:auto minmax(0,1fr); gap:7px; }
-    .weather-icon { width:30px; height:30px; }
-    .temperature { font-size:clamp(32px,8vw,42px); }
-    .range { font-size:12px; }
-    .city { font-size:13px; }
-    .settings { grid-column:2; justify-self:end; grid-row:1; font-size:18px; }
-    .weather-info { grid-column:2; grid-row:1; padding-right:17px; }
-    .date { font-size:14px; }
-    .time { font-size:clamp(43px,11vw,58px); }
-    .divider { height:68px; }
-  }
+:root{color-scheme:dark;--bg:#191919;--fg:#fff;--line:#414141}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:var(--bg)}
+body{color:var(--fg);font-family:Georgia,"Times New Roman",serif}
+.widget{width:100%;padding:22px 24px;background:var(--bg);color:var(--fg)}
+.header{display:grid;grid-template-columns:minmax(0,.8fr) 1px minmax(0,1.5fr);align-items:center;gap:clamp(14px,3vw,28px);padding-bottom:24px;border-bottom:1px solid var(--line)}
+.clock{font-size:clamp(54px,10vw,92px);line-height:.95;letter-spacing:-2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.header-divider{height:92px;background:var(--line)}
+.greeting{font-size:clamp(25px,4.5vw,42px);line-height:1.12;font-weight:bold}
+.date{margin-top:10px;font-size:clamp(17px,2.7vw,25px);line-height:1.25}
+.weather-section{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.85fr) minmax(0,1fr);align-items:center;gap:clamp(12px,2.5vw,26px);padding:24px 0;border-bottom:1px solid var(--line)}
+.current{min-width:0}
+.city{font-size:clamp(18px,2.7vw,26px);margin-bottom:12px}
+.current-row{display:flex;align-items:center;gap:clamp(10px,2vw,20px)}
+.temp{font-size:clamp(46px,8vw,72px);line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
+.weather-icon{width:clamp(48px,7vw,68px);height:clamp(48px,7vw,68px);flex:none}
+.condition{font-size:clamp(17px,2.6vw,24px);margin-top:10px}
+.range{font-size:clamp(17px,2.4vw,23px);line-height:1.7;white-space:nowrap}
+.range div+div{border-top:1px solid var(--line);padding-top:5px;margin-top:5px}
+.sun-times{border-left:1px solid var(--line);padding-left:clamp(14px,2.4vw,26px);display:grid;gap:18px}
+.sun-item{display:flex;align-items:center;gap:clamp(10px,2vw,18px);font-size:clamp(22px,3.2vw,32px);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sun-icon{width:clamp(48px,6vw,62px);height:clamp(48px,6vw,62px);flex:none}
+.liturgy{padding-top:24px}
+.season{font-size:clamp(29px,4vw,40px);font-weight:bold;line-height:1.15}
+.verse{font-size:clamp(20px,3vw,29px);line-height:1.4;margin-top:12px}
+.reference{font-size:clamp(17px,2.5vw,23px);margin-top:8px}
+.settings{position:absolute;right:10px;top:8px;border:0;background:transparent;color:#fff;opacity:.45;font-size:18px;cursor:pointer;padding:5px}
+.settings:hover{opacity:1}
+.config{display:none;gap:8px;padding-top:14px;margin-top:14px;border-top:1px solid var(--line)}
+.config.open{display:flex}
+.config input{flex:1;min-width:0;background:#242424;border:1px solid #777;border-radius:5px;color:#fff;padding:10px;font:16px Georgia,serif}
+.config button{background:transparent;border:1px solid #888;border-radius:5px;color:#fff;padding:8px 14px;font:16px Georgia,serif}
+.status{font-size:12px;margin-top:7px;min-height:14px;opacity:.8}
+@media(max-width:560px){
+ .widget{padding:16px 14px}
+ .header{grid-template-columns:minmax(0,.82fr) 1px minmax(0,1.4fr);gap:11px;padding-bottom:18px}
+ .clock{font-size:clamp(42px,12vw,60px);letter-spacing:-1px}
+ .header-divider{height:68px}
+ .greeting{font-size:clamp(20px,5.3vw,27px)}
+ .date{font-size:clamp(13px,3.6vw,17px);margin-top:7px}
+ .weather-section{grid-template-columns:minmax(0,1.15fr) minmax(0,.8fr);gap:12px;padding:18px 0}
+ .current{grid-column:1;grid-row:1}
+ .range{grid-column:1;grid-row:2;font-size:15px;display:flex;gap:12px;margin-top:9px}
+ .range div+div{border:0;padding:0;margin:0}
+ .sun-times{grid-column:2;grid-row:1 / span 2;padding-left:12px;gap:14px}
+ .sun-item{font-size:20px;gap:8px}
+ .sun-icon{width:38px;height:38px}
+ .city{font-size:16px;margin-bottom:9px}
+ .temp{font-size:clamp(39px,10vw,52px)}
+ .weather-icon{width:38px;height:38px}
+ .condition{font-size:15px;margin-top:7px}
+ .liturgy{padding-top:18px}
+ .season{font-size:27px}
+ .verse{font-size:19px;margin-top:9px}
+ .reference{font-size:16px;margin-top:6px}
+}
 </style>
 </head>
 <body>
 <div class="widget" aria-label="Contexto diário">
-  <div class="main">
-    <div>
-      <div class="time" id="clock">--:--</div>
-      <div class="date" id="date">Carregando data…</div>
-    </div>
-    <div class="divider"></div>
-    <div class="weather">
-      <div id="weatherIcon" class="weather-icon" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 45h31a10 10 0 0 0 0-20 16 16 0 0 0-30-3A12 12 0 0 0 17 45Z"/><path d="m23 51-3 6m18-6-3 6"/></svg>
-      </div>
-      <div class="weather-info">
-        <div class="temperature" id="temp">—°C</div>
-        <div class="range" id="range">Máx. —° · Mín. —°</div>
-        <div class="city" id="city">Barueri, SP</div>
-      </div>
-      <button class="settings" id="settings" aria-label="Alterar cidade" title="Alterar cidade">⚙</button>
-    </div>
+ <div class="header">
+  <div class="clock" id="clock">--:--</div><div class="header-divider"></div>
+  <div><div class="greeting" id="greeting">Bom dia, Limão!</div><div class="date" id="date">Carregando data…</div></div>
+ </div>
+ <section class="weather-section" aria-label="Condições meteorológicas">
+  <div class="current">
+   <div class="city" id="city">Barueri-SP</div>
+   <div class="current-row"><div class="temp" id="temp">— °C</div><div class="weather-icon" id="weatherIcon" aria-hidden="true"></div></div>
+   <div class="condition" id="condition">Carregando previsão…</div>
   </div>
-  <form class="config" id="config">
-    <input id="cityInput" type="text" placeholder="Digite cidade e estado" aria-label="Cidade" />
-    <button type="submit">Aplicar</button>
-  </form>
-  <div class="status" id="status" aria-live="polite"></div>
+  <div class="range"><div id="max">Máx. — °C</div><div id="min">Mín. — °C</div></div>
+  <div class="sun-times">
+   <div class="sun-item"><svg class="sun-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 45h48M15 38a17 17 0 0 1 34 0M32 28v-9m-14 12-6-6m34 6 6-6M32 38V27m-6 7 6-7 6 7"/></svg><span id="sunrise">--:--</span></div>
+   <div class="sun-item"><svg class="sun-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 45h48M15 38a17 17 0 0 1 34 0M32 28v-9m-14 12-6-6m34 6 6-6M32 27v11m-6-6 6 6 6-6"/></svg><span id="sunset">--:--</span></div>
+  </div>
+ </section>
+ <section class="liturgy" aria-label="Tempo litúrgico"><div class="season" id="season">Tempo Comum</div><div class="verse" id="verse">[4] Alegrai-vos sempre no Senhor; e digo outra vez: Alegrai-vos!</div><div class="reference" id="reference">[Filipenses 4:4 A21]</div></section>
+ <button class="settings" id="settings" aria-label="Configurar cidade" title="Configurar cidade">⚙</button>
+ <form class="config" id="config"><input id="cityInput" type="text" placeholder="Cidade e estado (ex.: Barueri, São Paulo)" aria-label="Cidade"/><button type="submit">Aplicar</button></form>
+ <div class="status" id="status" aria-live="polite"></div>
 </div>
 <script>
-(() => {
-  const $ = id => document.getElementById(id);
-  const weekdays = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
-  const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-  function tick(){ const d=new Date(); $('clock').textContent=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',hour12:false}); $('date').textContent=`${weekdays[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]}`; }
-  tick(); setInterval(tick,1000);
-  const codes = {0:['Céu limpo','sun'],1:['Predomínio de sol','sun'],2:['Parcialmente nublado','cloud-sun'],3:['Nublado','cloud'],45:['Neblina','cloud-fog'],48:['Neblina','cloud-fog'],51:['Garoa fraca','cloud-drizzle'],53:['Garoa','cloud-drizzle'],55:['Garoa forte','cloud-drizzle'],61:['Chuva fraca','cloud-rain'],63:['Chuva','cloud-rain'],65:['Chuva forte','cloud-rain'],71:['Neve fraca','cloud-snow'],73:['Neve','cloud-snow'],75:['Neve forte','cloud-snow'],80:['Pancadas fracas','cloud-rain'],81:['Pancadas','cloud-rain'],82:['Pancadas fortes','cloud-rain'],95:['Trovoadas','cloud-lightning'],96:['Trovoadas e granizo','cloud-lightning'],99:['Trovoadas e granizo','cloud-lightning']};
-  const icons = {
-    sun:'<circle cx="32" cy="32" r="11"/><path d="M32 4v8m0 40v8M4 32h8m40 0h8M12 12l6 6m28 28 6 6m0-40-6 6M18 46l-6 6"/>',
-    'cloud-sun':'<path d="M18 43h29a9 9 0 0 0 0-18 14 14 0 0 0-26-3"/><path d="M17 19V9m-8 10-5-5m13 0 5-5M14 48a9 9 0 1 1 0-18 12 12 0 0 1 10 6"/>',
-    cloud:'<path d="M15 46h34a11 11 0 0 0 0-22 16 16 0 0 0-30-3A13 13 0 0 0 15 46Z"/>',
-    'cloud-fog':'<path d="M15 38h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 38Z"/><path d="M10 47h42M16 55h32"/>',
-    'cloud-drizzle':'<path d="M15 39h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 39Z"/><path d="m22 47-2 4m15-4-2 4m15-4-2 4"/>',
-    'cloud-rain':'<path d="M15 38h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 38Z"/><path d="m22 46-4 10m19-10-4 10m19-10-4 10"/>',
-    'cloud-snow':'<path d="M15 37h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 37Z"/><path d="M22 45v9m-4-4 8 0m11-5v9m-4-4 8 0m7-5v9m-4-4 8 0"/>',
-    'cloud-lightning':'<path d="M15 36h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 36Z"/><path d="m34 40-9 12h9l-3 9 12-15h-9l4-6"/>'
-  };
-  function setIcon(name){ $('weatherIcon').innerHTML=`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${icons[name]||icons.cloud}</svg>`; }
-  async function loadWeather(query){
-    $('status').textContent='Atualizando previsão…';
-    try {
-      const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=pt&format=json`).then(r=>r.json());
-      if(!geo.results?.length) throw new Error('Cidade não encontrada. Tente incluir o estado.');
-      const p=geo.results[0];
-      const data=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1&timezone=auto`).then(r=>r.json());
-      $('temp').textContent=`${Math.round(data.current.temperature_2m)} °C`;
-      $('range').textContent=`Máx. ${Math.round(data.daily.temperature_2m_max[0])}° · Mín. ${Math.round(data.daily.temperature_2m_min[0])}°`;
-      $('city').textContent=[p.name,p.admin1].filter(Boolean).join(', ');
-      const [description,icon]=codes[data.current.weather_code]||['Condição atual','cloud']; setIcon(icon);
-      localStorage.setItem('jornada-weather-city',query);
-      $('status').textContent=description;
-    } catch(e){ $('status').textContent=e.message||'Não foi possível carregar a previsão.'; }
-  }
-  const saved=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo';
-  loadWeather(saved);
-  $('settings').addEventListener('click',()=>{ $('config').classList.toggle('open'); $('cityInput').value=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo'; });
-  $('config').addEventListener('submit',e=>{ e.preventDefault(); const q=$('cityInput').value.trim(); if(q) loadWeather(q); $('config').classList.remove('open'); });
-  setInterval(()=>loadWeather(localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo'),30*60*1000);
+(()=>{
+ const $=id=>document.getElementById(id);
+ const weekdays=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+ const months=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+ function tick(){const d=new Date();const h=d.getHours();$('clock').textContent=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',hour12:false});$('greeting').textContent=(h>=5&&h<12?'Bom dia':h>=12&&h<18?'Boa tarde':'Boa noite')+', Limão!';$('date').textContent=`${weekdays[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`;}
+ tick();setInterval(tick,15000);
+ const weatherCodes={0:'Céu limpo',1:'Predomínio de sol',2:'Parcialmente nublado',3:'Nublado',45:'Neblina',48:'Neblina',51:'Garoa fraca',53:'Garoa',55:'Garoa forte',56:'Garoa congelante',57:'Garoa congelante',61:'Chuva fraca',63:'Chuva',65:'Chuva forte',66:'Chuva congelante',67:'Chuva congelante',71:'Neve fraca',73:'Neve',75:'Neve forte',77:'Grãos de neve',80:'Pancadas fracas',81:'Pancadas de chuva',82:'Pancadas fortes',85:'Pancadas de neve',86:'Pancadas de neve',95:'Trovoadas',96:'Trovoadas e granizo',99:'Trovoadas e granizo'};
+ const paths={sun:'<circle cx="32" cy="32" r="11"/><path d="M32 4v8m0 40v8M4 32h8m40 0h8M12 12l6 6m28 28 6 6m0-40-6 6M18 46l-6 6"/>',cloud:'<path d="M15 46h34a11 11 0 0 0 0-22 16 16 0 0 0-30-3A13 13 0 0 0 15 46Z"/>',rain:'<path d="M15 38h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 38Z"/><path d="m22 46-4 10m19-10-4 10m19-10-4 10"/>',drizzle:'<path d="M15 39h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 39Z"/><path d="m22 47-2 4m15-4-2 4m15-4-2 4"/>',storm:'<path d="M15 36h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 36Z"/><path d="m34 40-9 12h9l-3 9 12-15h-9l4-6"/>',fog:'<path d="M15 38h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 38Z"/><path d="M10 47h42M16 55h32"/>'};
+ function iconFor(code){if([0,1].includes(code))return 'sun';if([45,48].includes(code))return 'fog';if([51,53,55,56,57].includes(code))return 'drizzle';if([95,96,99].includes(code))return 'storm';if([61,63,65,66,67,80,81,82].includes(code))return 'rain';return 'cloud';}
+ function setWeatherIcon(code){$('weatherIcon').innerHTML=`<svg viewBox="0 0 64 64" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${paths[iconFor(code)]||paths.cloud}</svg>`;}
+ function easterDate(year){const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;return new Date(year,month-1,day);}
+ function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+ function adventStart(year){const christmas=new Date(year,11,25);let x=new Date(christmas);while(x.getDay()!==0)x.setDate(x.getDate()-1);return addDays(x,-21);}
+ const seasonal={
+  advent:{name:'Advento',verse:'O povo que andava em trevas viu uma grande luz.',ref:'[Isaías 9:2 A21]'},
+  christmas:{name:'Natal',verse:'O Verbo se fez carne e habitou entre nós.',ref:'[João 1:14 A21]'},
+  epiphany:{name:'Epifania',verse:'Levanta-te, resplandece, porque vem a tua luz.',ref:'[Isaías 60:1 A21]'},
+  lent:{name:'Quaresma',verse:'Rasgai o coração, e não as vestes.',ref:'[Joel 2:13 A21]'},
+  easter:{name:'Páscoa',verse:'Cristo ressuscitou dentre os mortos.',ref:'[1 Coríntios 15:20 A21]'},
+  pentecost:{name:'Pentecostes',verse:'Todos ficaram cheios do Espírito Santo.',ref:'[Atos 2:4 A21]'},
+  ordinary:{name:'Tempo Comum',verse:'[4] Alegrai-vos sempre no Senhor; e digo outra vez: Alegrai-vos!',ref:'[Filipenses 4:4 A21]'}
+ };
+ function updateLiturgy(){const now=new Date();const y=now.getFullYear();const easter=easterDate(y);const ash=addDays(easter,-46);const pentecost=addDays(easter,49);const advent=adventStart(y);const jan6=new Date(y,0,6);const christmasStart=new Date(y,11,25);let key='ordinary';if(now>=advent&&now<new Date(y+1,0,6))key=now>=christmasStart?'christmas':'advent';else if(now>=new Date(y,0,6)&&now<ash)key='epiphany';else if(now>=ash&&now<easter)key='lent';else if(now>=easter&&now<pentecost)key='easter';else if(now>=pentecost&&now<advent)key='pentecost';else if(now<jan6)key='christmas';const s=seasonal[key];$('season').textContent=s.name;$('verse').textContent=s.verse;$('reference').textContent=s.ref;}
+ updateLiturgy();setInterval(updateLiturgy,6*60*60*1000);
+ async function loadWeather(query){$('status').textContent='Atualizando previsão…';try{const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=pt&format=json`).then(r=>r.json());if(!geo.results?.length)throw new Error('Cidade não encontrada. Tente informar cidade e estado.');const p=geo.results.find(x=>/São Paulo/i.test(x.admin1||''))||geo.results[0];const data=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=1&timezone=auto`).then(r=>r.json());$('temp').textContent=`${Math.round(data.current.temperature_2m)} °C`;$('max').textContent=`Máx. ${Math.round(data.daily.temperature_2m_max[0])} °C`;$('min').textContent=`Mín. ${Math.round(data.daily.temperature_2m_min[0])} °C`;$('condition').textContent=weatherCodes[data.current.weather_code]||'Condição atual';$('city').textContent=`${p.name}-${(p.country_code==='BR'&&p.admin1==='São Paulo')?'SP':(p.admin1||p.country||'').slice(0,2).toUpperCase()}`;$('sunrise').textContent=(data.daily.sunrise[0]||'').slice(11,16)||'--:--';$('sunset').textContent=(data.daily.sunset[0]||'').slice(11,16)||'--:--';setWeatherIcon(data.current.weather_code);localStorage.setItem('jornada-weather-city',query);$('status').textContent='';}catch(e){$('status').textContent=e.message||'Não foi possível carregar a previsão.';}}
+ const saved=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo';loadWeather(saved);$('settings').addEventListener('click',()=>{$('config').classList.toggle('open');$('cityInput').value=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo';});$('config').addEventListener('submit',e=>{e.preventDefault();const q=$('cityInput').value.trim();if(q)loadWeather(q);$('config').classList.remove('open');});setInterval(()=>loadWeather(localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo'),30*60*1000);
 })();
 </script>
 </body>
