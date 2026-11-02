@@ -61,6 +61,37 @@ body{color:var(--fg);font-family:Georgia,"Times New Roman",serif}
  .verse{font-size:19px;margin-top:9px}
  .reference{font-size:16px;margin-top:6px}
 }
+
+/* Ajustes compactos para o bloco incorporado no Notion mobile */
+@media(max-width:560px){
+ .widget{position:relative;padding:11px 13px 9px}
+ .header{grid-template-columns:minmax(0,.82fr) 1px minmax(0,1.45fr);gap:9px;padding-bottom:11px}
+ .clock{font-size:clamp(39px,11vw,52px);letter-spacing:-1.5px}
+ .header-divider{height:55px}
+ .greeting{font-size:clamp(18px,4.9vw,24px);line-height:1.08}
+ .date{font-size:clamp(12px,3.2vw,14px);line-height:1.18;margin-top:5px}
+ .weather-section{grid-template-columns:minmax(0,1.18fr) minmax(0,.82fr);gap:8px;padding:11px 0}
+ .current{grid-column:1;grid-row:1}
+ .city{font-size:14px;margin-bottom:5px}
+ .current-row{gap:7px}
+ .temp{font-size:clamp(36px,9.6vw,44px)}
+ .weather-icon{width:32px;height:32px}
+ .condition{font-size:13px;margin-top:4px}
+ .range{grid-column:1;grid-row:2;display:flex;gap:9px;font-size:12px;line-height:1.2;margin-top:6px;white-space:nowrap}
+ .range div+div{border:0;padding:0;margin:0}
+ .sun-times{grid-column:2;grid-row:1 / span 2;padding-left:9px;gap:8px}
+ .sun-item{font-size:17px;gap:6px}
+ .sun-icon{width:29px;height:29px}
+ .liturgy{padding:11px 0 1px}
+ .season{font-size:22px;line-height:1.1}
+ .verse{font-size:15px;line-height:1.25;margin-top:6px}
+ .reference{font-size:13px;margin-top:5px}
+ .settings{top:2px;right:2px;font-size:15px;padding:3px}
+ .config{padding-top:8px;margin-top:8px;gap:6px}
+ .config input{padding:7px;font-size:14px}
+ .config button{padding:6px 9px;font-size:14px}
+ .status{font-size:10px;min-height:0;margin-top:2px}
+}
 </style>
 </head>
 <body>
@@ -109,7 +140,30 @@ body{color:var(--fg);font-family:Georgia,"Times New Roman",serif}
   pentecost:{name:'Pentecostes',verse:'Todos ficaram cheios do Espírito Santo.',ref:'[Atos 2:4 A21]'},
   ordinary:{name:'Tempo Comum',verse:'[4] Alegrai-vos sempre no Senhor; e digo outra vez: Alegrai-vos!',ref:'[Filipenses 4:4 A21]'}
  };
- function updateLiturgy(){const now=new Date();const y=now.getFullYear();const easter=easterDate(y);const ash=addDays(easter,-46);const pentecost=addDays(easter,49);const advent=adventStart(y);const jan6=new Date(y,0,6);const christmasStart=new Date(y,11,25);let key='ordinary';if(now>=advent&&now<new Date(y+1,0,6))key=now>=christmasStart?'christmas':'advent';else if(now>=new Date(y,0,6)&&now<ash)key='epiphany';else if(now>=ash&&now<easter)key='lent';else if(now>=easter&&now<pentecost)key='easter';else if(now>=pentecost&&now<advent)key='pentecost';else if(now<jan6)key='christmas';const s=seasonal[key];$('season').textContent=s.name;$('verse').textContent=s.verse;$('reference').textContent=s.ref;}
+ function updateLiturgy(){
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const y=today.getFullYear();
+  const easter=easterDate(y);
+  const ash=addDays(easter,-46);
+  const pentecost=addDays(easter,49);
+  const advent=adventStart(y);
+  const epiphany=new Date(y,0,6);
+  const christmasStart=new Date(y,11,25);
+  const nextYearEpiphany=new Date(y+1,0,6);
+  let key='ordinary';
+  if(today>=advent&&today<nextYearEpiphany){key=today>=christmasStart?'christmas':'advent';}
+  else if(today>=epiphany&&today<ash){key='epiphany';}
+  else if(today>=ash&&today<easter){key='lent';}
+  else if(today>=easter&&today<pentecost){key='easter';}
+  else if(today.getTime()===pentecost.getTime()){key='pentecost';}
+  else if(today<epiphany){key='christmas';}
+  else{key='ordinary';}
+  const s=seasonal[key];
+  $('season').textContent=s.name;
+  $('verse').textContent=s.verse;
+  $('reference').textContent=s.ref;
+ }
  updateLiturgy();setInterval(updateLiturgy,6*60*60*1000);
  async function loadWeather(query){$('status').textContent='Atualizando previsão…';try{const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=pt&format=json`).then(r=>r.json());if(!geo.results?.length)throw new Error('Cidade não encontrada. Tente informar cidade e estado.');const p=geo.results.find(x=>/São Paulo/i.test(x.admin1||''))||geo.results[0];const data=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=1&timezone=auto`).then(r=>r.json());$('temp').textContent=`${Math.round(data.current.temperature_2m)} °C`;$('max').textContent=`Máx. ${Math.round(data.daily.temperature_2m_max[0])} °C`;$('min').textContent=`Mín. ${Math.round(data.daily.temperature_2m_min[0])} °C`;$('condition').textContent=weatherCodes[data.current.weather_code]||'Condição atual';$('city').textContent=`${p.name}-${(p.country_code==='BR'&&p.admin1==='São Paulo')?'SP':(p.admin1||p.country||'').slice(0,2).toUpperCase()}`;$('sunrise').textContent=(data.daily.sunrise[0]||'').slice(11,16)||'--:--';$('sunset').textContent=(data.daily.sunset[0]||'').slice(11,16)||'--:--';setWeatherIcon(data.current.weather_code);localStorage.setItem('jornada-weather-city',query);$('status').textContent='';}catch(e){$('status').textContent=e.message||'Não foi possível carregar a previsão.';}}
  const saved=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo';loadWeather(saved);$('settings').addEventListener('click',()=>{$('config').classList.toggle('open');$('cityInput').value=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo';});$('config').addEventListener('submit',e=>{e.preventDefault();const q=$('cityInput').value.trim();if(q)loadWeather(q);$('config').classList.remove('open');});setInterval(()=>loadWeather(localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo'),30*60*1000);
