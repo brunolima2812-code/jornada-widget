@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contexto diário — Jornada</title>
+<style>
+  :root { color-scheme: dark; --bg:#191919; --fg:#eeeeee; --muted:#a6a6a6; --line:#414141; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; width:100%; min-height:100%; background:var(--bg); }
+  body { color:var(--fg); font-family: Georgia, "Times New Roman", serif; }
+  .widget { width:100%; background:var(--bg); padding:14px 16px; }
+  .main { display:grid; grid-template-columns:minmax(0,1.15fr) 1px minmax(0,1fr); align-items:center; gap:clamp(12px,3vw,26px); }
+  .divider { width:1px; height:76px; background:var(--line); }
+  .time { font-size:clamp(48px,10vw,76px); line-height:.98; letter-spacing:-2px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .date { margin-top:8px; color:var(--muted); font-size:clamp(15px,3.3vw,23px); line-height:1.25; }
+  .weather { min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:12px; }
+  .weather-icon { width:clamp(36px,7vw,54px); height:clamp(36px,7vw,54px); color:#d7d7d7; }
+  .temperature { font-size:clamp(38px,7.5vw,60px); line-height:1; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .range { margin-top:5px; color:var(--muted); font-size:clamp(13px,2.7vw,19px); white-space:nowrap; }
+  .city { margin-top:8px; color:var(--muted); font-size:clamp(14px,2.8vw,19px); }
+  .settings { align-self:start; border:0; background:transparent; color:var(--muted); padding:4px; cursor:pointer; font:22px Georgia,serif; line-height:1; }
+  .settings:hover { color:var(--fg); }
+  .config { display:none; margin-top:12px; padding-top:10px; border-top:1px solid var(--line); gap:8px; }
+  .config.open { display:flex; }
+  .config input { flex:1; min-width:0; background:#242424; border:1px solid #555; border-radius:5px; color:var(--fg); padding:9px 10px; font:15px Georgia,serif; }
+  .config button { background:transparent; border:1px solid #666; border-radius:5px; color:var(--fg); padding:8px 12px; font:15px Georgia,serif; cursor:pointer; }
+  .status { color:var(--muted); font-size:12px; margin-top:7px; min-height:14px; }
+  @media (max-width:520px) {
+    .widget { padding:10px 8px; }
+    .main { gap:9px; grid-template-columns:minmax(0,1fr) 1px minmax(0,1.05fr); }
+    .weather { grid-template-columns:auto minmax(0,1fr); gap:7px; }
+    .weather-icon { width:30px; height:30px; }
+    .temperature { font-size:clamp(32px,8vw,42px); }
+    .range { font-size:12px; }
+    .city { font-size:13px; }
+    .settings { grid-column:2; justify-self:end; grid-row:1; font-size:18px; }
+    .weather-info { grid-column:2; grid-row:1; padding-right:17px; }
+    .date { font-size:14px; }
+    .time { font-size:clamp(43px,11vw,58px); }
+    .divider { height:68px; }
+  }
+</style>
+</head>
+<body>
+<div class="widget" aria-label="Contexto diário">
+  <div class="main">
+    <div>
+      <div class="time" id="clock">--:--</div>
+      <div class="date" id="date">Carregando data…</div>
+    </div>
+    <div class="divider"></div>
+    <div class="weather">
+      <div id="weatherIcon" class="weather-icon" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 45h31a10 10 0 0 0 0-20 16 16 0 0 0-30-3A12 12 0 0 0 17 45Z"/><path d="m23 51-3 6m18-6-3 6"/></svg>
+      </div>
+      <div class="weather-info">
+        <div class="temperature" id="temp">—°C</div>
+        <div class="range" id="range">Máx. —° · Mín. —°</div>
+        <div class="city" id="city">Barueri, SP</div>
+      </div>
+      <button class="settings" id="settings" aria-label="Alterar cidade" title="Alterar cidade">⚙</button>
+    </div>
+  </div>
+  <form class="config" id="config">
+    <input id="cityInput" type="text" placeholder="Digite cidade e estado" aria-label="Cidade" />
+    <button type="submit">Aplicar</button>
+  </form>
+  <div class="status" id="status" aria-live="polite"></div>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const weekdays = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  function tick(){ const d=new Date(); $('clock').textContent=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',hour12:false}); $('date').textContent=`${weekdays[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]}`; }
+  tick(); setInterval(tick,1000);
+  const codes = {0:['Céu limpo','sun'],1:['Predomínio de sol','sun'],2:['Parcialmente nublado','cloud-sun'],3:['Nublado','cloud'],45:['Neblina','cloud-fog'],48:['Neblina','cloud-fog'],51:['Garoa fraca','cloud-drizzle'],53:['Garoa','cloud-drizzle'],55:['Garoa forte','cloud-drizzle'],61:['Chuva fraca','cloud-rain'],63:['Chuva','cloud-rain'],65:['Chuva forte','cloud-rain'],71:['Neve fraca','cloud-snow'],73:['Neve','cloud-snow'],75:['Neve forte','cloud-snow'],80:['Pancadas fracas','cloud-rain'],81:['Pancadas','cloud-rain'],82:['Pancadas fortes','cloud-rain'],95:['Trovoadas','cloud-lightning'],96:['Trovoadas e granizo','cloud-lightning'],99:['Trovoadas e granizo','cloud-lightning']};
+  const icons = {
+    sun:'<circle cx="32" cy="32" r="11"/><path d="M32 4v8m0 40v8M4 32h8m40 0h8M12 12l6 6m28 28 6 6m0-40-6 6M18 46l-6 6"/>',
+    'cloud-sun':'<path d="M18 43h29a9 9 0 0 0 0-18 14 14 0 0 0-26-3"/><path d="M17 19V9m-8 10-5-5m13 0 5-5M14 48a9 9 0 1 1 0-18 12 12 0 0 1 10 6"/>',
+    cloud:'<path d="M15 46h34a11 11 0 0 0 0-22 16 16 0 0 0-30-3A13 13 0 0 0 15 46Z"/>',
+    'cloud-fog':'<path d="M15 38h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 38Z"/><path d="M10 47h42M16 55h32"/>',
+    'cloud-drizzle':'<path d="M15 39h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 39Z"/><path d="m22 47-2 4m15-4-2 4m15-4-2 4"/>',
+    'cloud-rain':'<path d="M15 38h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 38Z"/><path d="m22 46-4 10m19-10-4 10m19-10-4 10"/>',
+    'cloud-snow':'<path d="M15 37h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 37Z"/><path d="M22 45v9m-4-4 8 0m11-5v9m-4-4 8 0m7-5v9m-4-4 8 0"/>',
+    'cloud-lightning':'<path d="M15 36h34a10 10 0 0 0 0-20 15 15 0 0 0-29-3A12 12 0 0 0 15 36Z"/><path d="m34 40-9 12h9l-3 9 12-15h-9l4-6"/>'
+  };
+  function setIcon(name){ $('weatherIcon').innerHTML=`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${icons[name]||icons.cloud}</svg>`; }
+  async function loadWeather(query){
+    $('status').textContent='Atualizando previsão…';
+    try {
+      const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=pt&format=json`).then(r=>r.json());
+      if(!geo.results?.length) throw new Error('Cidade não encontrada. Tente incluir o estado.');
+      const p=geo.results[0];
+      const data=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1&timezone=auto`).then(r=>r.json());
+      $('temp').textContent=`${Math.round(data.current.temperature_2m)} °C`;
+      $('range').textContent=`Máx. ${Math.round(data.daily.temperature_2m_max[0])}° · Mín. ${Math.round(data.daily.temperature_2m_min[0])}°`;
+      $('city').textContent=[p.name,p.admin1].filter(Boolean).join(', ');
+      const [description,icon]=codes[data.current.weather_code]||['Condição atual','cloud']; setIcon(icon);
+      localStorage.setItem('jornada-weather-city',query);
+      $('status').textContent=description;
+    } catch(e){ $('status').textContent=e.message||'Não foi possível carregar a previsão.'; }
+  }
+  const saved=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo';
+  loadWeather(saved);
+  $('settings').addEventListener('click',()=>{ $('config').classList.toggle('open'); $('cityInput').value=localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo'; });
+  $('config').addEventListener('submit',e=>{ e.preventDefault(); const q=$('cityInput').value.trim(); if(q) loadWeather(q); $('config').classList.remove('open'); });
+  setInterval(()=>loadWeather(localStorage.getItem('jornada-weather-city')||'Barueri, São Paulo'),30*60*1000);
+})();
+</script>
+</body>
+</html>
